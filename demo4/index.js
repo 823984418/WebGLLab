@@ -62,11 +62,14 @@ canvas.addEventListener("keypress", event => {
  */
 let gl = canvas.getContext("webgl2");
 
-// 创建着色程序
-let program = buildProgram(gl, [
-    buildShader(gl, gl.VERTEX_SHADER, await fetchText("shader.vsh")),
-    buildShader(gl, gl.FRAGMENT_SHADER, await fetchText("shader.fsh")),
+
+let shaders = await Promise.all([
+    fetchText("shader.vsh").then(s => buildShader(gl, gl.VERTEX_SHADER, s)),
+    fetchText("shader.fsh").then(s => buildShader(gl, gl.FRAGMENT_SHADER, s)),
 ]);
+
+// 创建着色程序
+let program = buildProgram(gl, shaders);
 let positionLocation = gl.getAttribLocation(program, "position");
 let normalLocation = gl.getAttribLocation(program, "normal");
 let texCoordLocation = gl.getAttribLocation(program, "texCoord");
@@ -104,11 +107,20 @@ gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, MODEL_ELEMENT_INDEX, gl.STATIC_DRAW);
 
 let diffuseTextures = new Array(MODEL_TEXTURES.length);
 
+/**
+ * @type {Promise<Image>[]}
+ */
+let diffuseTexturePromises = new Array(MODEL_TEXTURES.length);
+for (let i = 0; i < MODEL_TEXTURES.length; i++) {
+    diffuseTexturePromises[i] = loadImage(`ningguang/${MODEL_TEXTURES[i]}`);
+}
+let diffuseTextureImages = await Promise.all(diffuseTexturePromises);
+
 for (let i = 0; i < MODEL_TEXTURES.length; i++) {
     let diffuseTexture = diffuseTextures[i] = gl.createTexture();
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, diffuseTexture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, await loadImage(`ningguang/${MODEL_TEXTURES[i]}`));
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, diffuseTextureImages[i]);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.MIRRORED_REPEAT);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.MIRRORED_REPEAT);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);

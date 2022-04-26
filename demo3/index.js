@@ -55,11 +55,13 @@ canvas.addEventListener("keypress", event => {
  */
 let gl = canvas.getContext("webgl2");
 
-// 创建着色程序
-let program = buildProgram(gl, [
-    buildShader(gl, gl.VERTEX_SHADER, await fetchText("shader.vsh")),
-    buildShader(gl, gl.FRAGMENT_SHADER, await fetchText("shader.fsh")),
+let shaders = await Promise.all([
+    fetchText("shader.vsh").then(s => buildShader(gl, gl.VERTEX_SHADER, s)),
+    fetchText("shader.fsh").then(s => buildShader(gl, gl.FRAGMENT_SHADER, s)),
 ]);
+
+// 创建着色程序
+let program = buildProgram(gl, shaders);
 let positionLocation = gl.getAttribLocation(program, "position");
 let normalLocation = gl.getAttribLocation(program, "normal");
 let matrixLocation = gl.getUniformLocation(program, "matrix");
