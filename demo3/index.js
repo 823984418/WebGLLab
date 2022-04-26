@@ -1,6 +1,6 @@
 import {buildShader, buildProgram} from "../gltools.js";
 import {fetchText} from "../iotools.js";
-import {glMatrix, mat4} from "../gl-matrix";
+import {glMatrix, mat4} from "../gl-matrix/index.js";
 import * as bunny from "../bunny.js";
 
 /**
