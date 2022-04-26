@@ -1,4 +1,4 @@
-import {vec3} from "./gl-matrix";
+import {vec3} from "./gl-matrix/index.js";
 
 export let VERTEX_DATA = new Float32Array([
     -0.00341018, 0.13031957, 0.02175437,
