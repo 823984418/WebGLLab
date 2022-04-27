@@ -413,6 +413,82 @@ for (let i = 0; i < displayFrameCount; i++) {
 
 }
 
+
+let rigidBodyCount = modelView.getInt32(offset, true);
+offset += 4;
+export let MODEL_RIGID_BODY = new Array(rigidBodyCount);
+for (let i = 0; i < rigidBodyCount; i++) {
+    let rigidBody = MODEL_RIGID_BODY[i] = {};
+
+    let localNameLength = modelView.getUint32(offset, true);
+    offset += 4;
+    rigidBody.localName = modelView.getText(offset, localNameLength);
+    offset += localNameLength;
+
+    let universalNameLength = modelView.getUint32(offset, true);
+    offset += 4;
+    rigidBody.universalName = modelView.getText(offset, universalNameLength);
+    offset += universalNameLength;
+
+    offset += boneIndexSize;
+
+    offset += 1;
+
+    offset += 2;
+
+    offset += 1;
+
+    offset += 3 * 4;
+
+    offset += 3 * 4;
+
+    offset += 3 * 4;
+
+    offset += 4;
+
+    offset += 4;
+
+    offset += 4;
+
+    offset += 4;
+
+    offset += 4;
+
+    offset += 1;
+}
+
+let jointCount = modelView.getInt32(offset, true);
+offset += 4;
+export let MODEL_JOINT = new Array(jointCount);
+for (let i = 0; i < jointCount; i++) {
+    let joint = MODEL_JOINT[i] = {};
+
+    let localNameLength = modelView.getUint32(offset, true);
+    offset += 4;
+    joint.localName = modelView.getText(offset, localNameLength);
+    offset += localNameLength;
+
+    let universalNameLength = modelView.getUint32(offset, true);
+    offset += 4;
+    joint.universalName = modelView.getText(offset, universalNameLength);
+    offset += universalNameLength;
+
+    offset += 1;
+
+    offset += rigidBodyIndexSize;
+
+    offset += rigidBodyIndexSize;
+    offset += 3 * 4;
+    offset += 3 * 4;
+    offset += 3 * 4;
+    offset += 3 * 4;
+    offset += 3 * 4;
+    offset += 3 * 4;
+    offset += 3 * 4;
+    offset += 3 * 4;
+}
+
+
 MODEL_TEXTURES[3] = "Texture/未知hack.png";
 
 console.log(MODEL_TEXTURES);
@@ -420,4 +496,6 @@ console.log(MODEL_MATERIALS);
 console.log(MODEL_BONES);
 console.log(MODEL_MORPHS);
 console.log(MODEL_DISPLAY_FRAMES);
+console.log(MODEL_RIGID_BODY);
+console.log(MODEL_JOINT);
 

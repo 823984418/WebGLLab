@@ -1,6 +1,6 @@
 import {buildShader, buildProgram} from "../gltools.js";
 import {fetchText, loadImage} from "../iotools.js";
-import {glMatrix, mat4} from "../gl-matrix/index.js";
+import {glMatrix, mat4, vec3} from "../gl-matrix/index.js";
 import {
     MODEL_ELEMENT_INDEX, MODEL_MATERIALS,
     MODEL_TEXTURES,
@@ -23,13 +23,26 @@ let y = 0;
 let cX = 0;
 let cY = 0;
 let cZ = 0;
+let rx = 0;
+let ry = 0;
 
 canvas.addEventListener("mousemove", event => {
-    if (event.currentTarget === event.target && (event.buttons & 1) !== 0) {
-        x = event.clientX / canvas.clientWidth - 0.5;
-        y = event.clientY / canvas.clientHeight - 0.5;
+    if (event.currentTarget === event.target) {
+        if ((event.buttons & 0b1) !== 0) {
+            x = event.clientX / canvas.clientWidth - 0.5;
+            y = event.clientY / canvas.clientHeight - 0.5;
+        }
+        if ((event.buttons & 0b10) !== 0) {
+            rx = event.clientX / canvas.clientWidth - 0.5;
+            ry = event.clientY / canvas.clientHeight - 0.5;
+        }
     }
 });
+
+
+canvas.addEventListener("contextmenu", event => {
+    event.preventDefault();
+})
 
 canvas.addEventListener("mousewheel", event => {
     cZ += event.deltaY * 0.001;
@@ -76,6 +89,7 @@ let texCoordLocation = gl.getAttribLocation(program, "texCoord");
 let matrixLocation = gl.getUniformLocation(program, "matrix");
 let normalMatrixLocation = gl.getUniformLocation(program, "normalMatrix");
 let diffuseTextureLocation = gl.getUniformLocation(program, "diffuseTexture");
+let lightLocation = gl.getUniformLocation(program, "light");
 
 
 // 创建顶点输入
@@ -105,6 +119,9 @@ let elementBuffer = gl.createBuffer();
 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, elementBuffer);
 gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, MODEL_ELEMENT_INDEX, gl.STATIC_DRAW);
 
+/**
+ * @type {WebGLTexture[]}
+ */
 let diffuseTextures = new Array(MODEL_TEXTURES.length);
 
 /**
@@ -168,6 +185,10 @@ async function draw() {
     gl.uniformMatrix4fv(normalMatrixLocation, false, normalMatrix);
 
     gl.uniform1i(diffuseTextureLocation, 0);
+    let light = [0, 0, 1];
+    vec3.rotateY(light, light, [0, 0, 0], glMatrix.toRadian(rx * 360));
+    vec3.rotateX(light, light, [0, 0, 0], glMatrix.toRadian(ry * 180));
+    gl.uniform3f(lightLocation, light[0], light[1], light[2]);
 
     gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER, null);
     gl.bindVertexArray(vertexArrayObject);
