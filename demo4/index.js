@@ -20,11 +20,26 @@ canvas.height = 700;
 
 let x = 0;
 let y = 0;
+let downX = 0;
+let downY = 0;
 let cX = 0;
 let cY = 0;
 let cZ = 0;
 let rx = 0;
 let ry = 0;
+
+canvas.addEventListener("mousedown", event => {
+    if (event.currentTarget === event.target) {
+        if ((event.buttons & 0b1) !== 0) {
+            downX += x;
+            downY += y;
+            x = event.clientX / canvas.clientWidth - 0.5;
+            y = event.clientY / canvas.clientHeight - 0.5;
+            downX -= x;
+            downY -= y;
+        }
+    }
+});
 
 canvas.addEventListener("mousemove", event => {
     if (event.currentTarget === event.target) {
@@ -171,8 +186,8 @@ async function draw() {
     let model = mat4.identity(mat4.create());
     mat4.translate(model, model, [0, 0, -1]);
     mat4.scale(model, model, [0.05, 0.05, 0.05]);
-    mat4.rotateX(model, model, glMatrix.toRadian(y * 360));
-    mat4.rotateY(model, model, glMatrix.toRadian(x * 360));
+    mat4.rotateX(model, model, glMatrix.toRadian((downY + y) * 360));
+    mat4.rotateY(model, model, glMatrix.toRadian((downX + x) * 360));
     mat4.rotateY(model, model, glMatrix.toRadian(180));
     mat4.translate(model, model, [0, -10, 0]);
 
