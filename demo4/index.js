@@ -15,8 +15,8 @@ import {
  */
 let canvas = document.querySelector("#mainCanvas");
 
-canvas.width = 900;
-canvas.height = 700;
+canvas.width = window.devicePixelRatio * document.body.clientWidth;
+canvas.height = window.devicePixelRatio * document.body.clientHeight;
 
 let x = 0;
 let y = 0;
@@ -25,8 +25,28 @@ let downY = 0;
 let cX = 0;
 let cY = 0;
 let cZ = 0;
-let rx = 0;
-let ry = 0;
+let rx = 0.125;
+let ry = 0.25;
+
+canvas.addEventListener("touchstart", event => {
+    if (event.currentTarget === event.target) {
+        event.preventDefault();
+        downX += x;
+        downY += y;
+        x = event.touches[0].clientX / canvas.clientWidth - 0.5;
+        y = event.touches[0].clientY / canvas.clientHeight - 0.5;
+        downX -= x;
+        downY -= y;
+    }
+});
+
+canvas.addEventListener("touchmove", event => {
+    if (event.currentTarget === event.target) {
+        event.preventDefault();
+        x = event.touches[0].clientX / canvas.clientWidth - 0.5;
+        y = event.touches[0].clientY / canvas.clientHeight - 0.5;
+    }
+});
 
 canvas.addEventListener("mousedown", event => {
     if (event.currentTarget === event.target) {
